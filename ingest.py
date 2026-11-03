@@ -33,7 +33,3 @@ def clean_raw_data(raw: list[dict]) -> list[dict]:
             continue
 
     return clean_data
-
-url = "https://dev-task.elancoapps.com/data/tick-sightings"
-raw = fetch_data(url)
-data = clean_raw_data(raw)
