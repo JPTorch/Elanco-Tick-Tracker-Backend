@@ -67,3 +67,9 @@ def get_sightings_per_location() -> dict:
     result = get_sightings()
     counts = Counter(item.get("location") for item in result.get("data", []))
     return {"sighting counts": dict(counts.most_common())}
+
+@app.get("/reports/monthly-sightings")
+def get_monthly_sightings() -> dict:
+    result = get_sightings()
+    counts = Counter(_parse_time(item.get("date")).strftime("%Y-%m") for item in result.get("data", []))
+    return {"monthly sightings": dict(counts.most_common())}
