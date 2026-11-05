@@ -61,3 +61,9 @@ def get_sightings(species: str | None = None, location: str | None = None, time_
         "count": len(filtered),
         "data": filtered
     }
+
+@app.get("/reports/sightings-per-location")
+def get_sightings_per_location() -> dict:
+    result = get_sightings()
+    counts = Counter(item.get("location") for item in result.get("data", []))
+    return {"sighting counts": dict(counts.most_common())}
