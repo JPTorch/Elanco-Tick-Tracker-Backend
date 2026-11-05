@@ -3,7 +3,11 @@ from datetime import datetime
 
 def fetch_data(url: str) -> list[dict]:
     response = requests.get(url, timeout=10)
-    response.raise_for_status()
+    status = response.raise_for_status()
+
+    if status is not None:
+        raise Exception(f"Failed to fetch data from {url}. Status code: {response.status_code}")
+
     return response.json()
 
 def clean_raw_data(raw: list[dict]) -> list[dict]:
