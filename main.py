@@ -1,6 +1,9 @@
 from datetime import datetime, timezone
-
 from ingest import fetch_data, clean_raw_data
+from fastapi import FastAPI
+from collections import Counter
+
+app = FastAPI()
 
 url = "https://dev-task.elancoapps.com/data/tick-sightings"
 
@@ -10,6 +13,7 @@ def _parse_time(value: str) -> datetime:
         parsed = parsed.replace(tzinfo=timezone.utc)
     return parsed
 
+@app.get("/sightings")
 def get_sightings(species: str | None = None, location: str | None = None, time_start: str | None = None, time_end: str | None = None) -> dict:
     raw = fetch_data(url)
 
