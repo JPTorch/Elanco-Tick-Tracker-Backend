@@ -1,55 +1,64 @@
 # Elanco Tick Tracker Backend
 
-## What this API does
+## Overview
 
-This API gets tick sightings from Elanco's data service. You can filter the
-sightings by species, location, or date, or get summaries by location and month.
+This API pulls tick sighting data from Elanco's service, lets you filter it by
+species, location, and date, and gives you summary reports by location and month.
+It is a small FastAPI project designed to make messy external data easier to
+query and review.
+
+## Tech stack
+
+- Python
+- FastAPI
+- Uvicorn
+- Requests
 
 ## Run it locally
 
-Install FastAPI, Uvicorn, and Requests, then start the server from the project
-folder:
+From the project folder, install the dependencies and start the server:
 
 ```bash
+pip install fastapi uvicorn requests
 uvicorn main:app --reload
 ```
 
-The API runs at `http://127.0.0.1:8000`. Try the endpoints in
-`http://127.0.0.1:8000/docs`, or view the schema at
-`http://127.0.0.1:8000/openapi.json`.
+Once it's running, the API is available at `http://127.0.0.1:8000`.
+
+- Swagger UI: `http://127.0.0.1:8000/docs`
+- OpenAPI schema: `http://127.0.0.1:8000/openapi.json`
 
 ## Endpoints
 
-- `GET /sightings` returns sightings. You can optionally pass `species`,
-  `location`, `time_start`, and `time_end` query parameters.
-- `GET /reports/sightings-per-location` counts sightings at each location.
-- `GET /reports/monthly-sightings` counts sightings by month.
+- `GET /sightings` returns the sightings data. You can filter with `species`,
+  `location`, `time_start`, and `time_end`.
+- `GET /reports/sightings-per-location` shows how many sightings occurred at each location.
+- `GET /reports/monthly-sightings` groups sightings by month.
 
-Species and location filters ignore capitalization and match part of a value.
-The date limits are inclusive and use ISO 8601 timestamps. If a timestamp has
-no timezone, the API treats it as UTC. Records without required fields, with an
-invalid date, or with an ID already seen are left out.
+### Query behavior
+
+- Species and location searches are case-insensitive and match partial values.
+- Date filters are inclusive and use ISO 8601 timestamps.
+- If a timestamp has no timezone, the API treats it as UTC.
+- Records with missing required fields, invalid dates, or duplicate IDs are excluded.
 
 ## Examples
 
-These requests assume the server is running on your computer. The response
-values below are examples; actual results depend on the data source.
+These examples assume the API is running on your machine.
 
 ### Get sightings
-
-To get all sightings:
 
 ```http
 GET http://127.0.0.1:8000/sightings
 ```
 
-To filter by species, location, and date range:
+Filter by species, location, and date range:
 
 ```http
 GET http://127.0.0.1:8000/sightings?species=deer&location=Texas&time_start=2026-01-01T00:00:00Z&time_end=2026-01-31T23:59:59Z
 ```
 
-For example:
+Example response:
 
 ```json
 {
@@ -77,7 +86,7 @@ For example:
 GET http://127.0.0.1:8000/reports/sightings-per-location
 ```
 
-For example:
+Example response:
 
 ```json
 {
@@ -94,7 +103,7 @@ For example:
 GET http://127.0.0.1:8000/reports/monthly-sightings
 ```
 
-For example:
+Example response:
 
 ```json
 {
@@ -107,13 +116,17 @@ For example:
 
 ## Data source and limitations
 
-Sightings come from `https://dev-task.elancoapps.com/data/tick-sightings`.
-The API fetches fresh data for each request and doesn't save or cache it. If the
-upstream service is unavailable, the request can fail; each fetch has a
+The app reads sighting data from:
+`https://dev-task.elancoapps.com/data/tick-sightings`
+
+It fetches fresh data on every request and does not save or cache anything locally.
+If the upstream service is unavailable, the request may fail, and each fetch has a
 10-second timeout.
 
-Records need an `id`, `date`, `location`, and `species`, and the date must be
+Records must include `id`, `date`, `location`, and `species`, and the date must be
 valid ISO 8601. Incomplete or invalid records are skipped. If two valid records
-have the same ID, only the first is used. There are no retries or fallback data.
-If the source returns no sightings, `/sightings` returns `null`; the report
-endpoints currently don't handle that case.
+share the same ID, only the first one is kept. There are no retry attempts or
+fallback data sources.
+
+If the source returns no sightings, `/sightings` returns `null`. The summary
+report endpoints do not currently handle that case explicitly.
