@@ -44,7 +44,9 @@ Once it's running, the API is available at `http://127.0.0.1:8000`.
 
 ## Examples
 
-These examples assume the API is running on your machine.
+These examples assume the API is running on your machine. The sightings
+response uses a record from the current data source; report counts are excerpts
+and may change when the source data changes.
 
 ### Get sightings
 
@@ -55,7 +57,7 @@ GET http://127.0.0.1:8000/sightings
 Filter by species, location, and date range:
 
 ```http
-GET http://127.0.0.1:8000/sightings?species=deer&location=Texas&time_start=2026-01-01T00:00:00Z&time_end=2026-01-31T23:59:59Z
+GET http://127.0.0.1:8000/sightings?species=marsh%20tick&location=Manchester&time_start=2022-08-01T00:00:00Z&time_end=2022-08-01T23:59:59Z
 ```
 
 Example response:
@@ -63,18 +65,19 @@ Example response:
 ```json
 {
   "query": {
-    "species": "deer",
-    "location": "Texas",
-    "time_start": "2026-01-01T00:00:00Z",
-    "time_end": "2026-01-31T23:59:59Z"
+    "species": "marsh tick",
+    "location": "Manchester",
+    "time_start": "2022-08-01T00:00:00Z",
+    "time_end": "2022-08-01T23:59:59Z"
   },
   "count": 1,
   "data": [
     {
-      "id": "sighting-123",
-      "date": "2026-01-15T12:30:00Z",
-      "location": "Austin, Texas",
-      "species": "Deer tick"
+      "date": "2022-08-01T06:40:31",
+      "id": "02WNholuSg6ndCk4c1dA",
+      "latinName": "Ixodes apronophorus",
+      "location": "Manchester",
+      "species": "Marsh tick"
     }
   ]
 }
@@ -86,13 +89,14 @@ Example response:
 GET http://127.0.0.1:8000/reports/sightings-per-location
 ```
 
-Example response:
+Example response excerpt:
 
 ```json
 {
   "sighting counts": {
-    "Austin, Texas": 12,
-    "Dallas, Texas": 7
+    "Nottingham": 95,
+    "Birmingham": 82,
+    "Glasgow": 78
   }
 }
 ```
@@ -103,13 +107,14 @@ Example response:
 GET http://127.0.0.1:8000/reports/monthly-sightings
 ```
 
-Example response:
+Example response excerpt:
 
 ```json
 {
   "monthly sightings": {
-    "2026-01": 19,
-    "2025-12": 14
+    "2017-06": 16,
+    "2013-09": 14,
+    "2018-02": 13
   }
 }
 ```
